@@ -2,7 +2,7 @@
 
 ### GET THE STRUCTURAL INFORMATION ABOUT VIRUSES (EG. SSRNA, DSDNA...) ###
 print "INPUT ICTV.TXT\n";
-$inictv = 'C:\Users\TealF\Documents\PNG\ICTV.txt';
+$inictv = 'ICTV.txt';
 open(INVIR, $inictv)||die "unable to open $inictv: $!\n";
 while(<INVIR>){
 		if($_ !~/^\d/){next;}
@@ -41,7 +41,7 @@ while(<INVIR>){
 
 #INPUT THE NAME OF EACH RANK
 print "INPUT FULL LINEAGE\n";
-$indat = 'C:\Users\TealF\Documents\PNG\fullnamelineage.dmp';
+$indat = 'fullnamelineage.dmp';
 open(INDAT, $indat)||die;
 while(<INDAT>){
 		if($_ !~/\w/){next;}
@@ -117,7 +117,7 @@ while(<INDAT>){
 #TID\TLEVEL
 #GET THE TYPE OF EACH TAXONOMIC RANK (EG. SPECIES, CLASS, SUPERKINGDOM...)
 print "INPUT LEVELS\n";
-$inlevs = 'C:\Users\TealF\Documents\PNG\nodes.dmp';
+$inlevs = 'nodes.dmp';
 open(INLEV, $inlevs)||die;
 while(<INLEV>){
 		if($_ !~/^\d/){next;}
@@ -134,7 +134,7 @@ while(<INLEV>){
 
 #USE THE RANKS AND CORRECTED NAMES TO GENERATE AN ORGANIZED LINEAGE
 print "INPUT TAXIDLINEAGES\n";
-$inlin = 'C:\Users\TealF\Documents\PNG\taxidlineage.dmp';
+$inlin = 'taxidlineage.dmp';
 open(INLIN, $inlin)||die;
 while(<INLIN>){
 		if($_ !~/^\d/){next;}
@@ -204,7 +204,7 @@ while(<INLIN>){
 
 #INPUT IMG GENOMES
 print "INPUT IMG GENOMES\n";
-$inimg = 'C:\Users\TealF\Documents\PNG\All_IMG_Genomes_Info_Reduced.txt';
+$inimg = 'All_IMG_Genomes.txt';
 open(INIMG, $inimg)||die;
 while(<INIMG>){
 		if($_ !~/^\d/){next;}
@@ -418,9 +418,11 @@ while(<INTDB>){
 }
 
 
+$time = localtime;
+$time =~ /(\d\d\d\d)$/;
+$year = $1;
 
-
-$output = 'C:\Users\TealF\Documents\PNG\TAXONOMY_DB_2020_raw.txt';
+$output = "TAXONOMY_DB_".$year."_raw.txt";
 open(OUTPUT, ">", $output)||die;
 foreach my $tid (keys %TAXON){
 	$TAXON{$tid} =~ s/\;/\t/g;
@@ -430,7 +432,7 @@ foreach my $tid (keys %TAXON){
 
 
 
-$input = 'C:\Users\TealF\Documents\PNG\TAXONOMY_DB_2020_raw.txt';
+$input = "TAXONOMY_DB_".$year."_raw.txt";
 open(INPUT, $input)||die;
 $on=0;
 BIGLOOP: while(<INPUT>){
@@ -637,94 +639,94 @@ CLEANLOOP: foreach my $lev (sort(keys %SYNS)){
 	$kc = keys %{$SYNS{$lev}};
 	$on++;
 	if($kc > 1){
-			#COMPARE ALL SYNONYMS IN EACH LEVEL
-			foreach my $top (sort(keys %{$SYNS{$lev}})){
-					foreach my $old (sort(keys %{$SYNS{$lev}})){
-							if($top eq $old){next;}
+		#COMPARE ALL SYNONYMS IN EACH LEVEL
+		foreach my $top (sort(keys %{$SYNS{$lev}})){
+			foreach my $old (sort(keys %{$SYNS{$lev}})){
+				if($top eq $old){next;}
 
-							#COMPARE NEW AND OLD LEVEL BY LEVEL 
-							@NOW = split(";", $top, -1); $nc = @NOW;
-							@OLD = split(";", $old, -1); $oc = @OLD;
-							if($nc < $oc || $nc > $oc){ #IF DIFFERENT MIXED LEVEL SYNONYMS
-								$newlev = $lev;
-								   if( $nc == 3 && $newlev !~ /ALES$/ ){ $newlev=~ s/[AEIOU]+[^AEIOU]*$/ALES/; $do = $top;}
-								elsif( $nc == 4 && $newlev !~ /ACEA$/ ){ $newlev=~ s/[AEIOU]+[^AEIOU]*$/ACEA/; $do = $top;}
-								elsif( $nc == 5 && $newlev !~ /IUM$/  ){ $newlev=~ s/[AEIOU]+[^AEIOU]*$/IUM/;  $do = $top;}
-								elsif( $oc == 3 && $newlev !~ /ALES$/ ){ $newlev=~ s/[AEIOU]+[^AEIOU]*$/ALES/; $do = $old;}
-								elsif( $oc == 4 && $newlev !~ /ACEA$/ ){ $newlev=~ s/[AEIOU]+[^AEIOU]*$/ACEA/; $do = $old;}
-								elsif( $oc == 5 && $newlev !~ /IUM$/  ){ $newlev=~ s/[AEIOU]+[^AEIOU]*$/IUM/;  $do = $old;}
-								else{}
-								if($newlev ne $lev){
-									foreach my $tid (keys %{$SYNS{$lev}{$do}}){ 
-										if($TAXON{$tid} =~ /\b$lev/){$TAXON{$tid} =~ s/\b$lev/$newlev/g;}
-										$SYNS{$newlev}{$do}{$tid}=1;
-									} 
-									delete($SYNS{$lev}{$do});
-									redo CLEANLOOP;
-								}
+				#COMPARE NEW AND OLD LEVEL BY LEVEL 
+				@NOW = split(";", $top, -1); $nc = @NOW;
+				@OLD = split(";", $old, -1); $oc = @OLD;
+				if($nc < $oc || $nc > $oc){ #IF DIFFERENT MIXED LEVEL SYNONYMS
+					$newlev = $lev;
+					   if( $nc == 3 && $newlev !~ /ALES$/ ){ $newlev=~ s/[AEIOU]+[^AEIOU]*$/ALES/; $do = $top;}
+					elsif( $nc == 4 && $newlev !~ /ACEA$/ ){ $newlev=~ s/[AEIOU]+[^AEIOU]*$/ACEA/; $do = $top;}
+					elsif( $nc == 5 && $newlev !~ /IUM$/  ){ $newlev=~ s/[AEIOU]+[^AEIOU]*$/IUM/;  $do = $top;}
+					elsif( $oc == 3 && $newlev !~ /ALES$/ ){ $newlev=~ s/[AEIOU]+[^AEIOU]*$/ALES/; $do = $old;}
+					elsif( $oc == 4 && $newlev !~ /ACEA$/ ){ $newlev=~ s/[AEIOU]+[^AEIOU]*$/ACEA/; $do = $old;}
+					elsif( $oc == 5 && $newlev !~ /IUM$/  ){ $newlev=~ s/[AEIOU]+[^AEIOU]*$/IUM/;  $do = $old;}
+					else{}
+					if($newlev ne $lev){
+						foreach my $tid (keys %{$SYNS{$lev}{$do}}){ 
+							if($TAXON{$tid} =~ /\b$lev/){$TAXON{$tid} =~ s/\b$lev/$newlev/g;}
+							$SYNS{$newlev}{$do}{$tid}=1;
+						} 
+						delete($SYNS{$lev}{$do});
+						redo CLEANLOOP;
+					}
+				}
+				else{ 	#SAME LEVEL SYNONYM	- CHECK IF TOP DISCREPANCY							
+					@TMP=();
+					$good= 0; $empt= 0; $bad = 0; $mid = 0; $fill = 0;
+					for my $i (0..$#OLD){
+
+							#REMOVE POTENTIALLY PREVIOUSLY ADDED
+							$test1 = $NOW[$i]; if($i > 2 ){$test1 =~ s/(ALPHA|BETA|GAMMA|DELTA|EPSILON|ZETA|THETA|IOTA|KAPPA|LAMBDA)//g;}
+							$test2 = $OLD[$i]; if($i > 2 ){$test2 =~ s/(ALPHA|BETA|GAMMA|DELTA|EPSILON|ZETA|THETA|IOTA|KAPPA|LAMBDA)//g;}
+
+							#GET COUNTS OF EACH LEVEL:GOOD EMPTY OR BAD
+							if($test1 eq $test2 && $test1 =~ /\w/){ $good++; push(@TMP, $test1); if($i > 1 && $i < 6){ $mid++; }}
+							elsif($OLD[$i-1] eq $NOW[$i-1] && $OLD[$i+1] eq $NOW[$i+1] && $NOW[$i-1] =~ /\w/ && $NOW[$i+1] =~ /\w/){
+								if($LEVCNT{$NOW[$i]} > $LEVCNT{$OLD[$i]} && $NOW[$i] =~ /\w/){ push(@TMP, $test1); }
+								else{ push(@TMP, $test2); }
+								$fill++; $good++; 									
 							}
-							else{ 	#SAME LEVEL SYNONYM	- CHECK IF TOP DISCREPANCY							
-									@TMP=();
-									$good= 0; $empt= 0; $bad = 0; $mid = 0; $fill = 0;
-									for my $i (0..$#OLD){
-
-											#REMOVE POTENTIALLY PREVIOUSLY ADDED
-											$test1 = $NOW[$i]; if($i > 2 ){$test1 =~ s/(ALPHA|BETA|GAMMA|DELTA|EPSILON|ZETA|THETA|IOTA|KAPPA|LAMBDA)//g;}
-											$test2 = $OLD[$i]; if($i > 2 ){$test2 =~ s/(ALPHA|BETA|GAMMA|DELTA|EPSILON|ZETA|THETA|IOTA|KAPPA|LAMBDA)//g;}
-
-											#GET COUNTS OF EACH LEVEL:GOOD EMPTY OR BAD
-											if($test1 eq $test2 && $test1 =~ /\w/){ $good++; push(@TMP, $test1); if($i > 1 && $i < 6){ $mid++; }}
-											elsif($OLD[$i-1] eq $NOW[$i-1] && $OLD[$i+1] eq $NOW[$i+1] && $NOW[$i-1] =~ /\w/ && $NOW[$i+1] =~ /\w/){
-												if($LEVCNT{$NOW[$i]} > $LEVCNT{$OLD[$i]} && $NOW[$i] =~ /\w/){ push(@TMP, $test1); }
-												else{ push(@TMP, $test2); }
-												$fill++; $good++; 									
-											}
-											elsif($test1 eq '' && $test2 ne ''){$empt++; push(@TMP, $test2);}
-											elsif($test2 eq '' && $test1 ne ''){$empt++; push(@TMP, $test1);}
-											else{ $bad++; 
-												if(!exists($OLDDB{$tid})){ push(@TMP, $NOW[$i]); }
-												elsif($oc>$nc || $OLD[$i] !~ /UNCLASSIFIED/){push(@TMP, $OLD[$i]); }
-												else{push(@TMP, $NOW[$i]);}
-											}
-									}
-									
-
-									#IF GOOD, JUST SMALL DISCREPANCY, REPLACE
-									if($good >= 3 && $bad == 1 && $empt > 0){$newtop='';}
-									elsif($good >= 3 && $bad < 2 && $mid >= 1){ $newtop = join(";", @TMP); }
-									elsif($good > 1 && $bad == 0 ){ $newtop = join(";", @TMP); }
-									elsif($#OLD == 1 && $good > 0 && $bad == 0){ print "lev $lev top $top old $old tmp @TMP\n"; $newtop = join(";", @TMP); }
-									else{$newtop='';}
-									
-									if($lev eq "CRYPTOPHYCIIA"){print "CRYPTOPHYCIIA kc $kc good $good bad $bad empt $empt last $#OLD tmp @TMP\n";}
-
-									#FIX OLD LEVELS AND RESTART LOOP
-									if($newtop ne $top && $newtop =~ /\w/){ 
-										foreach my $tid (keys %{$SYNS{$lev}{$top}}){ 
-											@XOLD = split(";", $TAXON{$tid},-1);
-											$b4 = $TAXON{$tid};
-											for my $i (0..$#TMP){ $XOLD[$i]=$TMP[$i]; }
-											$TAXON{$tid}=join(";", @XOLD); 
-											$SYNS{$lev}{$newtop}{$tid}=1;
-											if($lev eq "CRYPTOPHYCIIA"){print "tid $tid top $TAXON{$tid}\n";}
-										}
-										delete($SYNS{$lev}{$top});
-									}
-									if($newtop ne $old && $newtop =~ /\w/){ 
-										foreach my $tid (keys %{$SYNS{$lev}{$old}}){ 
-											@XOLD = split(";", $TAXON{$tid},-1);
-											$b4 = $TAXON{$tid};
-											for my $i (0..$#TMP){ $XOLD[$i]=$TMP[$i]; }
-											$TAXON{$tid}=join(";", @XOLD); 
-											$SYNS{$lev}{$newtop}{$tid}=1;
-											if($lev eq "CRYPTOPHYCIIA"){print "tid $tid top $TAXON{$tid}\n";}
-										}
-										delete($SYNS{$lev}{$old});
-									}
-									#redo CLEANLOOP; #START AGAIN FROM SPECIES AND MAKE SURE IT IS FIXED
+							elsif($test1 eq '' && $test2 ne ''){$empt++; push(@TMP, $test2);}
+							elsif($test2 eq '' && $test1 ne ''){$empt++; push(@TMP, $test1);}
+							else{ $bad++; 
+								if(!exists($OLDDB{$tid})){ push(@TMP, $NOW[$i]); }
+								elsif($oc>$nc || $OLD[$i] !~ /UNCLASSIFIED/){push(@TMP, $OLD[$i]); }
+								else{push(@TMP, $NOW[$i]);}
 							}
 					}
+
+
+					#IF GOOD, JUST SMALL DISCREPANCY, REPLACE
+					if($good >= 3 && $bad == 1 && $empt > 0){$newtop='';}
+					elsif($good >= 3 && $bad < 2 && $mid >= 1){ $newtop = join(";", @TMP); }
+					elsif($good > 1 && $bad == 0 ){ $newtop = join(";", @TMP); }
+					elsif($#OLD == 1 && $good > 0 && $bad == 0){ print "lev $lev top $top old $old tmp @TMP\n"; $newtop = join(";", @TMP); }
+					else{$newtop='';}
+
+					if($lev eq "CRYPTOPHYCIIA"){print "CRYPTOPHYCIIA kc $kc good $good bad $bad empt $empt last $#OLD tmp @TMP\n";}
+
+					#FIX OLD LEVELS AND RESTART LOOP
+					if($newtop ne $top && $newtop =~ /\w/){ 
+						foreach my $tid (keys %{$SYNS{$lev}{$top}}){ 
+							@XOLD = split(";", $TAXON{$tid},-1);
+							$b4 = $TAXON{$tid};
+							for my $i (0..$#TMP){ $XOLD[$i]=$TMP[$i]; }
+							$TAXON{$tid}=join(";", @XOLD); 
+							$SYNS{$lev}{$newtop}{$tid}=1;
+							if($lev eq "CRYPTOPHYCIIA"){print "tid $tid top $TAXON{$tid}\n";}
+						}
+						delete($SYNS{$lev}{$top});
+					}
+					if($newtop ne $old && $newtop =~ /\w/){ 
+						foreach my $tid (keys %{$SYNS{$lev}{$old}}){ 
+							@XOLD = split(";", $TAXON{$tid},-1);
+							$b4 = $TAXON{$tid};
+							for my $i (0..$#TMP){ $XOLD[$i]=$TMP[$i]; }
+							$TAXON{$tid}=join(";", @XOLD); 
+							$SYNS{$lev}{$newtop}{$tid}=1;
+							if($lev eq "CRYPTOPHYCIIA"){print "tid $tid top $TAXON{$tid}\n";}
+						}
+						delete($SYNS{$lev}{$old});
+					}
+					#redo CLEANLOOP; #START AGAIN FROM SPECIES AND MAKE SURE IT IS FIXED
+				}
 			}
+		}
 	}
 }
 undef(%SYNS);
@@ -813,13 +815,10 @@ FINLOOP: foreach my $lev (sort(keys %SYNS)){
 }
 
 
-
-
-
 #FILL IN THE BLANKS 
 print "OUTPUT FIXED NAMES\n";
 @PL=("KINGDOM", "PHYLUM", "CLASS", "ORDER", "FAMILY", "GENUS", "SPECIES");
-$output = 'C:\Users\TealF\Documents\PNG\TAXONOMY_DB_2020.txt';
+$output = "TAXONOMY_DB_".$year.".txt";
 open(OUTPUT, ">", $output)||die;
 foreach my $tid (keys %TAXON){
 		$TAXON{$tid} =~ s/[\;\s]+$//g;
@@ -848,6 +847,6 @@ foreach my $tid (keys %TAXON){
 		print OUTPUT "$tid\t$out\n";
 }
 
-$outcyto = 'C:\Users\TealF\Documents\PNG\TAXONOMY_DB_2020.cyto';
+$outcyto = "TAXONOMY_DB_".$year.".cyto";
 open(OUTCYTO, ">", $outcyto)||die;
 foreach my $phyla (sort(keys %CYTO)){ print OUTCYTO "$phyla\t$CYTO{$phyla}\n"; }
