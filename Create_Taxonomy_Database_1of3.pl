@@ -13,29 +13,29 @@ while(<INVIR>){
         @stuff = split("\t", $_,-1);
         $stuff[15]=""; #fixes problem with misid'd satellites
         if(exists($VIRTYPE{$stuff[9]}) && exists($VIRTYPE{$stuff[11]}) && exists($VIRTYPE{$stuff[13]})){next;}
-        if($_ =~ /(SATELLIT|ALBETOVIRUS|AUMAIVIRUS|PAPANIVIRUS|VIRTOVIRUS|SARTHROVIRIDAE|MACRONOVIRUS)/){
-        	foreach my $i (@ODDS){ if($stuff[$i]  =~ /\w/){$VIRTYPE{$stuff[$i]} ="MONA;VIRUSES;SATELLITES";}}
-			next;}
-        if($_ =~ /(PHAGE|CAUDOVIRALES|ACKERMANNVIRIDAE|AUTOLYKIVIRIDAE|CORTICOVIRIDAE|CYSTOVIRIDAE|INOVIRIDAE)/){
- 			foreach my $i (@ODDS){ if($stuff[$i]  =~ /\w/){$VIRTYPE{$stuff[$i]} ="MONA;VIRUSES;PHAGE";}}
-			next;}
-		if($_ =~ /(LEVIVIRIDAE|MICROVIRIDAE|SPHAEROLIPOVIRIDAE|MYOVIRIDAE|PODOVIRIDAE|SIPHOVIRIDAE|TECTIVIRIDAE)/){
- 			foreach my $i (@ODDS){ if($stuff[$i]  =~ /\w/){$VIRTYPE{$stuff[$i]} ="MONA;VIRUSES;PHAGE";}}
-			next;}
-		
+	if($_ =~ /(SATELLIT|ALBETOVIRUS|AUMAIVIRUS|PAPANIVIRUS|VIRTOVIRUS|SARTHROVIRIDAE|MACRONOVIRUS)/){
+		foreach my $i (@ODDS){ if($stuff[$i]  =~ /\w/){$VIRTYPE{$stuff[$i]} ="MONA;VIRUSES;SATELLITES";}}
+		next;}
+	if($_ =~ /(PHAGE|CAUDOVIRALES|ACKERMANNVIRIDAE|AUTOLYKIVIRIDAE|CORTICOVIRIDAE|CYSTOVIRIDAE|INOVIRIDAE)/){
+		foreach my $i (@ODDS){ if($stuff[$i]  =~ /\w/){$VIRTYPE{$stuff[$i]} ="MONA;VIRUSES;PHAGE";}}
+		next;}
+	if($_ =~ /(LEVIVIRIDAE|MICROVIRIDAE|SPHAEROLIPOVIRIDAE|MYOVIRIDAE|PODOVIRIDAE|SIPHOVIRIDAE|TECTIVIRIDAE)/){
+		foreach my $i (@ODDS){ if($stuff[$i]  =~ /\w/){$VIRTYPE{$stuff[$i]} ="MONA;VIRUSES;PHAGE";}}
+		next;}
+
         #CLEAN UP STRUCTURAL CLASS NAMING
-        $stuff[17]=~/([DS]*.NA)/; 					$type = $1;
-        $stuff[17]=~/[DS]*.NA.*[DS]*(.NA)/;			$type = $1;
-        if($type !~ /\w/){ 							$type = ""; }
-        elsif($stuff[17]=~/RT|RETRO/){				$type .= "_RT";}
-        elsif($stuff[17]=~/\+|POS/){ 				$type .= "_POS";}
-        elsif($stuff[17]=~/\-|NEG/){ 				$type .= "_NEG";}
-        elsif($stuff[17]=~/([\+\-]).*([\+\-])/){ 	$type .= "_BOTH";}
+        $stuff[17]=~/([DS]*.NA)/;		$type = $1;
+        $stuff[17]=~/[DS]*.NA.*[DS]*(.NA)/;	$type = $1;
+        if($type !~ /\w/){			$type = ""; }
+        elsif($stuff[17]=~/RT|RETRO/){		$type .= "_RT";}
+        elsif($stuff[17]=~/\+|POS/){		$type .= "_POS";}
+        elsif($stuff[17]=~/\-|NEG/){		$type .= "_NEG";}
+        elsif($stuff[17]=~/([\+\-]).*([\+\-])/){$type .= "_BOTH";}
         else{$type=$type;}  	#KEEP AN EYE ON THIS IN CASE ICTV ADDS CATEGORY
         
-		#NAME WITH STRUCTURAL CLASS
-		$stuff[17]=$type;
-		foreach my $i (@ODDS){ if($stuff[$i]  =~ /\w/){$VIRTYPE{$stuff[$i]} ="MONA;VIRUSES;$stuff[17]";}}
+	#NAME WITH STRUCTURAL CLASS
+	$stuff[17]=$type;
+	foreach my $i (@ODDS){ if($stuff[$i]  =~ /\w/){$VIRTYPE{$stuff[$i]} ="MONA;VIRUSES;$stuff[17]";}}
 }
 
 
@@ -55,15 +55,15 @@ while(<INIMG>){
 		
 		#FIX NAME AND FILL MISSING
 		@TMP = @stuff[0..8]; # 0:Domain 1:Phylum 2:Class 3:Order 4:Family 5:Genus 6:Species 7:Strain 8:Genome/Sample
-		if($TMP[0]=~/UNKNOWN/ && $_ =~ /ARCHAEON/){ $TMP[0] = "ARCHAEA";} 	#FIX IMG UNKNOWN ARCHAEON ISSUE
-		for my $y (0..8){ $TMP[$y] = fix_names($TMP[$y]); } 				#GENERAL NAME CLEAN-UP
-		if($TMP[8] !~ /$TMP[7]/ && $TMP[7]=~/\w/){ $TMP[8].="_".$TMP[7];} 	#FILL IN STRAIN INFO FROM COL 9
-		if($TMP[8]=~/\w/){$TMP[7]=$TMP[8];} 								#REPLACE WITH FULL STRAIN NAME FROM COL 9
-		if($TMP[6] !~ /\w/ && $TMP[5] =~ /\w/){ 							#FILL IN SPECIES WITH GENUS - NEED FOR LATER
+		if($TMP[0]=~/UNKNOWN/ && $_ =~ /ARCHAEON/){ $TMP[0] = "ARCHAEA";}	#FIX IMG UNKNOWN ARCHAEON ISSUE
+		for my $y (0..8){ $TMP[$y] = fix_names($TMP[$y]); }			#GENERAL NAME CLEAN-UP
+		if($TMP[8] !~ /$TMP[7]/ && $TMP[7]=~/\w/){ $TMP[8].="_".$TMP[7];}	#FILL IN STRAIN INFO FROM COL 9
+		if($TMP[8]=~/\w/){$TMP[7]=$TMP[8];}					#REPLACE WITH FULL STRAIN NAME FROM COL 9
+		if($TMP[6] !~ /\w/ && $TMP[5] =~ /\w/){					#FILL IN SPECIES WITH GENUS - NEED FOR LATER
 			if($TMP[0] =~ /VIRUS/){$TMP[6]=$TMP[5];}
 			else{$TMP[6]=$TMP[5]."_SP";}
 		}
-		if($TMP[6] !~ /\w/){ $TMP[6] = $TMP[8];}							#IF STILL NO SPECIES, FILL WITH GENOME/SAMPLE
+		if($TMP[6] !~ /\w/){ $TMP[6] = $TMP[8];}				#IF STILL NO SPECIES, FILL WITH GENOME/SAMPLE
 		
 		#GET THE HIGHEST MICROBIOME INFO THAT ISN'T TOO SPECIFIC NOR UNCLASSIFIED
 		if($TMP[0]=~/MICROBIOME/){ for my $x (2..5){ if($TMP[$x] ne "UNCLASSIFIED" && $TMP[$x] ne ""){ $NOW[2]=$TMP[$x]; }} }
@@ -76,36 +76,35 @@ while(<INIMG>){
 			#then sort the vectors (plasmids, artificial constructs, IS)
 			#then grab the unknown/other - quiddam
 			#then deal with satellites, phages, and all other viruses
-			   if($line=~/(ECOLOGICAL|ENVIRONMENTAL)/        && $line =~ /(METAGENOME|MICROBIOME)/){ 						@NOW[0..1]=split(";", "MICROBIOME;ENVIRONMENTAL",-1);}
-			elsif($line=~/(ORGANISMAL|HOST)/                 && $line =~ /(METAGENOME|MICROBIOME)/){ 						@NOW[0..1]=split(";", "MICROBIOME;HOST-ASSOCIATED",-1);} 
-			elsif($line=~/(ENGINEERED|SYNTHETIC|ARTIFICIAL)/ && $line =~ /(METAGENOME|MICROBIOME)/){ 						@NOW[0..1]=split(";", "MICROBIOME;ENGINEERED",-1);}
-			elsif($line=~/(METAGENOME|MICROBIOME)/){																		@NOW[0..1]=split(";", "MICROBIOME;UNCLASSIFIED_MICROBIOME",-1);}
-			elsif($line=~/(ARTIFICIAL|SYNTHETIC|VECTOR|COSMID|CONSTRUCT)/){    												@NOW[0..1]=split(";", "MONA;CONSTRUCTS",-1); $NOW[6]=$TMP[7];}
-			elsif($line=~/(INSERTION.SEQUENCE|TRANSPOSON|INTEGRON)/){														@NOW[0..1]=split(";", "MONA;TRANSPOSONS",-1);$NOW[6]=$TMP[7];}
-			elsif($line=~/([^A-Z]PLASMID|PLASMID[^A-Z]|MINICHROMOSOME)/ || $TMP[0]=~/PLASMID/){ 							@NOW[0..1]=split(";", "MONA;PLASMIDS",-1);   $NOW[6]=$TMP[7];}
-			elsif($line=~/(UNCLASSIFIED.ENTRIES|OTHER.SEQUENCES)/ || $TMP[0]!~/\w/){ 										@NOW[0..1]=split(";", "QUIDDAM;$TMP[7]",-1);}
-			elsif($line=~/(SATELLITE|VIRUS.*SATELLIT)/){																	@NOW[0..2]=split(";", "MONA;VIRUSES;SATELLITES",-1); @NOW[3..7]=@TMP[3..7];}
-			elsif($line=~/(ALBETOVIRUS|AUMAIVIRUS|PAPANIVIRUS|VIRTOVIRUS|SARTHROVIRIDAE|MACRONOVIRUS)/){ 					@NOW[0..2]=split(";", "MONA;VIRUSES;SATELLITES",-1); @NOW[3..7]=@TMP[3..7];}
-			elsif($line=~/PHAGE/ && $line=~/VIRUS/){																		@NOW[0..2]=split(";", "MONA;VIRUSES;PHAGE",-1); @NOW[3..7]=@TMP[3..7];}
-			elsif($line=~/(CAUDOVIRALES|ACKERMANNVIRIDAE|AUTOLYKIVIRIDAE|CORTICOVIRIDAE|CYSTOVIRIDAE|INOVIRIDAE)/){ 		@NOW[0..2]=split(";", "MONA;VIRUSES;PHAGE",-1); @NOW[3..7]=@TMP[3..7];}
-			elsif($line=~/(LEVIVIRIDAE|MICROVIRIDAE|SPHAEROLIPOVIRIDAE|MYOVIRIDAE|PODOVIRIDAE|SIPHOVIRIDAE|TECTIVIRIDAE)/){ @NOW[0..2]=split(";", "MONA;VIRUSES;PHAGE",-1); @NOW[3..7]=@TMP[3..7];}	
+			   if($line=~/(ECOLOGICAL|ENVIRONMENTAL)/ && $line =~ /(METAGENOME|MICROBIOME)/){		@NOW[0..1]=split(";", "MICROBIOME;ENVIRONMENTAL",-1);}
+			elsif($line=~/(ORGANISMAL|HOST)/ && $line =~ /(METAGENOME|MICROBIOME)/){			@NOW[0..1]=split(";", "MICROBIOME;HOST-ASSOCIATED",-1);} 
+			elsif($line=~/(ENGINEERED|SYNTHETIC|ARTIFICIAL)/ && $line =~ /(METAGENOME|MICROBIOME)/){	@NOW[0..1]=split(";", "MICROBIOME;ENGINEERED",-1);}
+			elsif($line=~/(METAGENOME|MICROBIOME)/){							@NOW[0..1]=split(";", "MICROBIOME;UNCLASSIFIED_MICROBIOME",-1);}
+			elsif($line=~/(ARTIFICIAL|SYNTHETIC|VECTOR|COSMID|CONSTRUCT)/){					@NOW[0..1]=split(";", "MONA;CONSTRUCTS",-1); $NOW[6]=$TMP[7];}
+			elsif($line=~/(INSERTION.SEQUENCE|TRANSPOSON|INTEGRON)/){					@NOW[0..1]=split(";", "MONA;TRANSPOSONS",-1);$NOW[6]=$TMP[7];}
+			elsif($line=~/([^A-Z]PLASMID|PLASMID[^A-Z]|MINICHROMOSOME)/ || $TMP[0]=~/PLASMID/){		@NOW[0..1]=split(";", "MONA;PLASMIDS",-1);   $NOW[6]=$TMP[7];}
+			elsif($line=~/(UNCLASSIFIED.ENTRIES|OTHER.SEQUENCES)/ || $TMP[0]!~/\w/){			@NOW[0..1]=split(";", "QUIDDAM;$TMP[7]",-1);}
+			elsif($line=~/(SATELLITE|VIRUS.*SATELLIT)/){							@NOW[0..2]=split(";", "MONA;VIRUSES;SATELLITES",-1); @NOW[3..7]=@TMP[3..7];}
+			elsif($line=~/(ALBETOVIRUS|AUMAIVIRUS|PAPANIVIRUS|VIRTOVIRUS|SARTHROVIRIDAE|MACRONOVIRUS)/){	@NOW[0..2]=split(";", "MONA;VIRUSES;SATELLITES",-1); @NOW[3..7]=@TMP[3..7];}
+			elsif($line=~/PHAGE/ && $line=~/VIRUS/){							@NOW[0..2]=split(";", "MONA;VIRUSES;PHAGE",-1); @NOW[3..7]=@TMP[3..7];}
+			elsif($line=~/(CAUDOVIRALES|ACKERMANNVIRIDAE|AUTOLYKIVIRIDAE|CORTICOVIRIDAE|CYSTOVIRIDAE|INOVIRIDAE)/){		@NOW[0..2]=split(";", "MONA;VIRUSES;PHAGE",-1); @NOW[3..7]=@TMP[3..7];}
+			elsif($line=~/(LEVIVIRIDAE|MICROVIRIDAE|SPHAEROLIPOVIRIDAE|MYOVIRIDAE|PODOVIRIDAE|SIPHOVIRIDAE|TECTIVIRIDAE)/){	@NOW[0..2]=split(";", "MONA;VIRUSES;PHAGE",-1); @NOW[3..7]=@TMP[3..7];}	
 			elsif($line=~/VIRUSES|VIRUS[\_\b]/){ 
 				@NOW[3..7]=@TMP[3..7];
 				foreach my $lev (@TMP){ if(exists($VIRTYPE{$lev})){ @NOW[0..2]=split(";", $VIRTYPE{$lev},-1);  last;}}
 				if($NOW[0] !~ /MONA/){
-			        $stuff[1]=~/([DS]*.NA)/; 					$type = $1;
-			        $stuff[1]=~/[DS]*.NA.*[DS]*(.NA)/;			$type = $1;
-			        if($type !~ /\w/){ 							$type = ""; }
-			        elsif($stuff[1]=~/RT|RETRO/){				$type .= "_RT";}
-			        elsif($stuff[1]=~/\+|POS/){ 				$type .= "_POS";}
-			        elsif($stuff[1]=~/\-|NEG/){ 				$type .= "_NEG";}
-			        elsif($stuff[1]=~/([\+\-]).*([\+\-])/){ 	$type .= "_BOTH";}
-			        else{$type=$type;}
-			        $NOW[0]="MONA"; $NOW[1]="VIRUSES"; $NOW[2]=$type; 
+				        $stuff[1]=~/([DS]*.NA)/;				$type = $1;
+				        $stuff[1]=~/[DS]*.NA.*[DS]*(.NA)/;			$type = $1;
+				        if($type !~ /\w/){ 					$type = "";}
+				        elsif($stuff[1]=~/RT|RETRO/){				$type .= "_RT";}
+				        elsif($stuff[1]=~/\+|POS/){ 				$type .= "_POS";}
+				        elsif($stuff[1]=~/\-|NEG/){ 				$type .= "_NEG";}
+				        elsif($stuff[1]=~/([\+\-]).*([\+\-])/){ 	$type .= "_BOTH";}
+				        else{$type=$type;}
+				        $NOW[0]="MONA"; $NOW[1]="VIRUSES"; $NOW[2]=$type; 
 				}
 			}
 			else{ @NOW[0..1]=split(";", "QUIDDAM;$TMP[7]",-1);}
-			
 		}
 
 		#STORE
@@ -138,23 +137,22 @@ while(<INDAT>){
 		if($tid==2787823){$name="QUIDDAM";} #make unclassified > quiddam
 		if($tid==408169 ){$name="MICROBIOME";} #makes metagenome > microbiome
 		$name = fix_names($name);
-		$NAMES{$tid}=$name; if($tid == 882018){print "882018 name1 $name\n";}
 
 		#GET THE MONA AND MICROBIOMES 
 		if($line=~/CELLULAR.ORGANISMS/){next;}
-		elsif($line=~/OTHER.SEQUENCES/ && $line =~ /ARTIFICIAL|SYNTHETIC|VECTOR|COSMID|CONSTRUCT/){    						$ODD{$tid}="MONA;CONSTRUCTS";}
-		elsif($line=~/OTHER.SEQUENCES/ && $line=~/PLASMID|MINICHROMOSOME/){       											$ODD{$tid}="MONA;PLASMIDS";}
-		elsif($line=~/INSERTION.SEQUENCE|TRANSPOSON|INTEGRON/){																$ODD{$tid}="MONA;TRANSPOSONS";}
-		elsif($line=~/(ECOLOGICAL|ENVIRONMENTAL)/ 		 && $line =~ /(METAGENOME|MICROBIOME)/){							$ODD{$tid}="MICROBIOME;ENVIRONMENTAL";}
-		elsif($line=~/(ORGANISMAL|HOST)/ 				 && $line =~ /(METAGENOME|MICROBIOME)/){ 							$ODD{$tid}="MICROBIOME;HOST-ASSOCIATED";} 
-		elsif($line=~/(ENGINEERED|SYNTHETIC|ARTIFICIAL)/ && $line =~ /(METAGENOME|MICROBIOME)/){ 							$ODD{$tid}="MICROBIOME;ENGINEERED";}
-		elsif($line=~/(METAGENOME|MICROBIOME)/){ 																			$ODD{$tid}="MICROBIOME;UNCLASSIFIED_MICROBIOME";}		
-		elsif($line=~/(UNCLASSIFIED.ENTRIES|OTHER.SEQUENCES)/){ 															$ODD{$tid}="QUIDDAM;$name";}
-		elsif($line=~/(SATELLITE|VIRUS.*SATELLIT)/){																		$ODD{$tid}="MONA;VIRUSES;SATELLITES";}
-		elsif($line=~/(ALBETOVIRUS|AUMAIVIRUS|PAPANIVIRUS|VIRTOVIRUS|SARTHROVIRIDAE|MACRONOVIRUS)/){ 					 	$ODD{$tid}="MONA;VIRUSES;SATELLITES";}
-		elsif($line=~/PHAGE/ && $line=~/VIRUS/){																			$ODD{$tid}="MONA;VIRUSES;PHAGE";}
-		elsif($line=~/(CAUDOVIRALES|ACKERMANNVIRIDAE|AUTOLYKIVIRIDAE|CORTICOVIRIDAE|CYSTOVIRIDAE|INOVIRIDAE)/){ 		 	$ODD{$tid}="MONA;VIRUSES;PHAGE";}
-		elsif($line=~/(LEVIVIRIDAE|MICROVIRIDAE|SPHAEROLIPOVIRIDAE|MYOVIRIDAE|PODOVIRIDAE|SIPHOVIRIDAE|TECTIVIRIDAE)/){ 	$ODD{$tid}="MONA;VIRUSES;PHAGE";}	
+		elsif($line=~/OTHER.SEQUENCES/ && $line =~ /ARTIFICIAL|SYNTHETIC|VECTOR|COSMID|CONSTRUCT/){			$ODD{$tid}="MONA;CONSTRUCTS";}
+		elsif($line=~/OTHER.SEQUENCES/ && $line=~/PLASMID|MINICHROMOSOME/){						$ODD{$tid}="MONA;PLASMIDS";}
+		elsif($line=~/INSERTION.SEQUENCE|TRANSPOSON|INTEGRON/){								$ODD{$tid}="MONA;TRANSPOSONS";}
+		elsif($line=~/(ECOLOGICAL|ENVIRONMENTAL)/ && $line =~ /(METAGENOME|MICROBIOME)/){				$ODD{$tid}="MICROBIOME;ENVIRONMENTAL";}
+		elsif($line=~/(ORGANISMAL|HOST)/ && $line =~ /(METAGENOME|MICROBIOME)/){					$ODD{$tid}="MICROBIOME;HOST-ASSOCIATED";} 
+		elsif($line=~/(ENGINEERED|SYNTHETIC|ARTIFICIAL)/ && $line =~ /(METAGENOME|MICROBIOME)/){			$ODD{$tid}="MICROBIOME;ENGINEERED";}
+		elsif($line=~/(METAGENOME|MICROBIOME)/){									$ODD{$tid}="MICROBIOME;UNCLASSIFIED_MICROBIOME";}		
+		elsif($line=~/(UNCLASSIFIED.ENTRIES|OTHER.SEQUENCES)/){								$ODD{$tid}="QUIDDAM;$name";}
+		elsif($line=~/(SATELLITE|VIRUS.*SATELLIT)/){									$ODD{$tid}="MONA;VIRUSES;SATELLITES";}
+		elsif($line=~/(ALBETOVIRUS|AUMAIVIRUS|PAPANIVIRUS|VIRTOVIRUS|SARTHROVIRIDAE|MACRONOVIRUS)/){			$ODD{$tid}="MONA;VIRUSES;SATELLITES";}
+		elsif($line=~/PHAGE/ && $line=~/VIRUS/){									$ODD{$tid}="MONA;VIRUSES;PHAGE";}
+		elsif($line=~/(CAUDOVIRALES|ACKERMANNVIRIDAE|AUTOLYKIVIRIDAE|CORTICOVIRIDAE|CYSTOVIRIDAE|INOVIRIDAE)/){		$ODD{$tid}="MONA;VIRUSES;PHAGE";}
+		elsif($line=~/(LEVIVIRIDAE|MICROVIRIDAE|SPHAEROLIPOVIRIDAE|MYOVIRIDAE|PODOVIRIDAE|SIPHOVIRIDAE|TECTIVIRIDAE)/){	$ODD{$tid}="MONA;VIRUSES;PHAGE";}	
 		elsif($line=~/VIRUSES|VIRUS[\_\b]/){
 		 	$stuff[4]=~s/\;\s+/\;/g; 
 			@NOW=split(";",$stuff[4]); 
@@ -193,9 +191,6 @@ while(<INLEV>){
 		if($LEVS{$tid} eq "GENUS"){ 		$MIDS{$NAMES{$tid}}=5; } #track mid names for later
 }
 
-print "882018 name3 $NAMES{882018}\n";
-
-
 #USE THE RANKS AND CORRECTED NAMES TO GENERATE AN ORGANIZED LINEAGE
 print "INPUT TAXIDLINEAGES\n";
 $on=0;
@@ -213,15 +208,13 @@ while(<INLIN>){
 		@LIN=@NLIN;
 		push(@LIN, $tid);
 
-		if($tid == 882018){print "882018 name4 lin @LIN now @NOW\n";}
-
 		#FIRST GET MAIN 8 RANKS: K/P/C/O/F/G/S/T
 		%HoA=(); @NOW=();
 		for my $i (0..$#LIN){
 			$id = $LIN[$i];
 			@NOW=@{$HoA{$tid}};
 			if($id !~ /\d/){next;}
-			   if($LEVS{$id} eq "SUPERKINGDOM"){ 	$HoA{$tid}[0]=$NAMES{$id};  $ch=1;}
+			   if($LEVS{$id} eq "SUPERKINGDOM"){ 		$HoA{$tid}[0]=$NAMES{$id};  $ch=1;}
 			elsif($LEVS{$id} eq "PHYLUM"){ 			$HoA{$tid}[1]=$NAMES{$id};  $ch=2;}
 			elsif($LEVS{$id} eq "CLASS"){ 			$HoA{$tid}[2]=$NAMES{$id};  $ch=3;}
 			elsif($LEVS{$id} eq "ORDER"){			$HoA{$tid}[3]=$NAMES{$id};  $ch=4;}
@@ -238,15 +231,11 @@ while(<INLIN>){
 			if($tid == 882018){print "ch $ch id $id level $LEVS{$id} name $NAMES{$id} hoa6 $HoA{$tid}[6] hoa7 $HoA{$tid}[7] now @NOW\n";}
 		}
 		#NOW EXTRA RANKS ARE ACCOUNTED FOR IN PRIMARY RANK CONTEXT
-
-		if($tid == 882018){print "882018 name4 lin @LIN now @NOW\n";}
-
-		
+	
 		#LOOP THROUGH TID AND OTHER MID-LEVELS
 		foreach my $xid (keys %HoA){
 			@TMP=();
 			@NOW=@{$HoA{$xid}};
-			if($xid == 882018){print "882018 name5 now @NOW\n";}
 
 			#GET MICROBIOME AND MONA LEVELS
 			if(exists($ODD{$xid})){ 
@@ -261,8 +250,6 @@ while(<INLIN>){
 			if($NOW[0]=~/VIRUS/){ $NOW[0]="MONA"; $NOW[1]="VIRUSES"; }
 			if($NOW[0]!~/\w/){ $NOW[0]="QUIDDAM"; }
 
-			if($xid == 882018){print "882018 name6 now @NOW tmp @TMP\n";}
-
 			#MOVE CLEANED SPECIES BECOME MID-NAMES FROM SPECIES 
 			#(unclassified salmonella -> salmonella, move to genus, empty species)
 			if(exists($MIDS{$NOW[6]})){ #species is bad
@@ -273,7 +260,6 @@ while(<INLIN>){
 				else{ $NOW[$MIDS{$NOW[6]}]=$NOW[6]; $NOW[6]=''; } 
 			}
 			while($NOW[$#NOW] !~ /\w/){pop(@NOW);}
-			if($xid == 882018){print "882018 name7 now @NOW tmp @TMP\n";}
 			$LINEAGES{$xid}=[@NOW];
 		}
 		$on++;
@@ -288,7 +274,6 @@ $output = "TAXONOMY_DB_".$year."_raw.txt";
 open(OUTPUT, ">", $output)||die;
 foreach my $tid (keys %LINEAGES){
 	@NOW = @{$LINEAGES{$tid}};
-	if($tid == 882018){print "882018 name8 lin @LIN now @NOW\n";}
 	
 	#HANDLE BAD MID-LEVELS (HAVE MIXED/SPLIT/NONSENSE NAMES
 	if( $NOW[0] =~ /QUIDDAM|MICROBIOME/ || $NOW[2] =~ /[DR]NA\_/ ){ $lin=join("\t",@{$LINEAGES{$tid}}); print OUTPUT "$tid\t$lin\n"; next;}
@@ -300,12 +285,9 @@ foreach my $tid (keys %LINEAGES){
 		if($NOW[5]=~/\w/){$NOW[5] =~ s/\_.*//;}
 	}
 	
-	
-	
 	$LINEAGES{$tid}=[@NOW];
 	$lin=join("\t",@{$LINEAGES{$tid}});
 	print OUTPUT "$tid\t$lin\n";
-	if($tid == 882018){print "882018 name9 lin @LIN now @NOW\n";}
 }
 
 
