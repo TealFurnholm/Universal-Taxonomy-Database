@@ -26,17 +26,17 @@ The previous version of this software did not handle strains - placing species a
 
 ### RUNNING THE SCRIPT
 You need perl installed and either have the environment set up so you can just double click on the .pl files (windows) or run the perl scripts. Else put them in the perl "bin" folder. There are 3 scripts to run, each outputs a raw file so if there is a problem you can figure out where the problem occurs.
-1. Create_Taxonomy_Database_1of3.pl
+#### 1. Create_Taxonomy_Database_1of3.pl
 - inputs the ICTV, NCBI and JGI taxonomy data
 - organizes it roughly into the 8 taxonomic ranks
 - creates ranks for non-cellular organisms (microbiome, plasmids, viruses...)
 - does some specific mid-rank and other name fixes (eg Propionibacterium to Cutibacterium)
-2. Create_Taxonomy_Database_2of3
+#### 2. Create_Taxonomy_Database_2of3.pl
 - does kingdom/organism type (viruses, satellites, phages, archaea, bacteria, eukaryota...) specific organization and name fixes for species and strain ranks
 - fills in missing mid-ranks found in species/strain
 - if no Kingdom-Genus ranks, adds mid-rank
 - the purpose is to get something more resembling a linnaean species in the species rank, something more unified, and make a distinct species rank
-3. Create_Taxonomy_Database_3of3
+#### 3. Create_Taxonomy_Database_3of3.pl
 - now that the species rank is streamlined and any mid levels that can be gleaned are filled in
 - standardized the mid level suffixes for each rank
 - fix synonyms in mixed or same rank levels
@@ -44,9 +44,9 @@ You need perl installed and either have the environment set up so you can just d
 
 ### EXAMPLES: 
 start: 1803148	EUKARYOTA	ASCOMYCOTA	SORDARIOMYCETES				XYLARIOMYCETIDAE_SP_ARIZ_AZ0199
-end: 1803148	EUKARYOTA	ASCOMYCOTA	SORDARIOMYCETES		XYLARIOMYCETIDAE		XYLARIOMYCETIDAE_SP	XYLARIOMYCETIDAE_SP_ARIZ_AZ0199
-start: 1000652	MONA	VIRUSES	HERVIVIRICETES	HERPESVIRALES	HERPESVIRIDAE		PROCAVIA_CAPENSIS_GAMMAHERPESVIRUS_2
-end: 1000652	MONA	VIRUSES	HERVIVIRICETES	HERPESVIRALES	HERPESVIRIDAE	GAMMAHERPESVIRUS	PROCAVIA_CAPENSIS_GAMMAHERPESVIRUS	PROCAVIA_CAPENSIS_GAMMAHERPESVIRUS_2
+<br>end: 1803148	EUKARYOTA	ASCOMYCOTA	SORDARIOMYCETES		XYLARIOMYCETIDAE		XYLARIOMYCETIDAE_SP	XYLARIOMYCETIDAE_SP_ARIZ_AZ0199
+<br>start: 1000652	MONA	VIRUSES	HERVIVIRICETES	HERPESVIRALES	HERPESVIRIDAE		PROCAVIA_CAPENSIS_GAMMAHERPESVIRUS_2
+<br>end: 1000652	MONA	VIRUSES	HERVIVIRICETES	HERPESVIRALES	HERPESVIRIDAE	GAMMAHERPESVIRUS	PROCAVIA_CAPENSIS_GAMMAHERPESVIRUS	PROCAVIA_CAPENSIS_GAMMAHERPESVIRUS_2
 
 ### OUTPUTS:
  - TAXONOMY_DB_[current year].txt: tab delimited taxonomy database
