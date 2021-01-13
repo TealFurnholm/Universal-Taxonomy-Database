@@ -31,7 +31,7 @@ while(<INVIR>){
         elsif($stuff[17]=~/\+|POS/){ 				$type .= "_POS";}
         elsif($stuff[17]=~/\-|NEG/){ 				$type .= "_NEG";}
         elsif($stuff[17]=~/([\+\-]).*([\+\-])/){ 	$type .= "_BOTH";}
-        else{$type=$type;}  #KEEP AN EYE ON THIS IN CASE ICTV ADDS CATEGORY
+        else{$type=$type;}  	#KEEP AN EYE ON THIS IN CASE ICTV ADDS CATEGORY
         
 		#NAME WITH STRUCTURAL CLASS
 		$stuff[17]=$type;
