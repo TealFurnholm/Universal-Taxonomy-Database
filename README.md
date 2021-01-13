@@ -1,8 +1,9 @@
 # Universal-Taxonomy-Database
-#### *I have advanced metastatic cancer, and am working part-time on stuff that does not directly fund this work. I just did this because I couldn't stand the horrid state of existing taxonomy in public databases, particularly as meta-omics and genome sequencing advances. I cannot add features or debug at this point. Please feel free to use/modify/improve this code, but please acknowledge me somewhere if you publish it - call it a dying wish (though hopefully the treatments work and I won't die soon!).
+#### *I have advanced metastatic cancer and am working on this unfunded between my paid work. I did this because I just couldn't stand the horrid state of existing taxonomy in public databases, particularly as meta-omics and genome sequencing advances. I cannot add features or debug at this point. Please feel free to use/modify/improve this code, but please acknowledge me somewhere if you publish it - call it a dying wish (though hopefully the treatments work and I won't die soon!).
 ### PURPOSE: 
 The current state of taxonomy of life is deeply broken, creating a tangled and useless "tree" say if you were trying to graph out what organisms you have in your metagenome. This script fixes the extensive taxonomic errors (detailed:https://academic.oup.com/database/article/doi/10.1093/database/baaa062/5881509) in the phylogenies of all named organisms, creating a table of computer-readable phylogenetic lineages with their public database numeric identifiers. Each of the 8 primary taxonomic ranks (kingdom, phylum, class, order, family, genus, species, strain) have been curated to remove synonyms, gaps, and non-conformity to naming conventions. Where no conventions are available, such as for strains, metagenomes and all non-cellular organisms, new conventions were created to minimize modification of existing names but ensuring strict adherence to heirarchical-tree structure without conflicts with other organisms. I specifically tackled the STUPID decision on the part of NCBI, which stopped giving different strains their own unique taxon ID#s: https://link.springer.com/article/10.4056/sigs.4851102
-The previous version of this software did not handle strains - placing species and strains into the same column. Why? Because scientists are irresponsible in their naming when they deposit new genomes/data, often putting some junk as a species/strain (eg. "endosymbiont of A. syntrophicus" ) instead of following basic Linnaean format. This script goes through several gyrations to try and figure out and correct species and strain names, but I cant seem to account for all ways people have borked the names. 
+The previous version of this software did not handle strains - placing species and strains into the same column. Why? Because scientists are irresponsible in their naming when they deposit new genomes/data, often putting some junk as a species/strain (eg. "endosymbiont of A. syntrophicus" or "[author's name] et. al. 2008") instead of following basic Linnaean format. This script goes through several gyrations to try and figure out and correct species and strain names in order to create a phylogenetic tree of life that doesn't have stupidly tangled branches from bad naming.
+
 ### INPUTS:
 #### 1. NCBI: Taxonomy data were downloaded from the NCBI FTP site 
  - https://ftp.ncbi.nih.gov/pub/taxonomy/new_taxdump/
@@ -22,9 +23,31 @@ The previous version of this software did not handle strains - placing species a
  - open in excel, save the 3rd tab - master species list - as a tab delimited text file "ICTV.txt" 
  - put with the rest of the input files
 #### 4. Current taxonomy database
-### OUTPUTS:
- - TAXONOMY_DB_2020.txt: tab delimited taxonomy database
- - TAXONOMY_DB_2020.cyto: tab delimited network file for cytoscape (really it's too big to graph but you can check the "Target" column for duplicates to find issues in the code)
 
-### NOTE: THIS SOFTWARE IS A BIT BORKED
- - I was doing this during a period when I was contracted for other work - and there are so very MANY ways people have messed up naming organisms that to code for every eventuality was taking too long, so there may be a few remaining naming issues affecting a small proportion of organisms. 
+### RUNNING THE SCRIPT
+You need perl installed and either have the environment set up so you can just double click on the .pl files (windows) or run the perl scripts. Else put them in the perl "bin" folder. There are 3 scripts to run, each outputs a raw file so if there is a problem you can figure out where the problem occurs.
+1. Create_Taxonomy_Database_1of3.pl
+- inputs the ICTV, NCBI and JGI taxonomy data
+- organizes it roughly into the 8 taxonomic ranks
+- creates ranks for non-cellular organisms (microbiome, plasmids, viruses...)
+- does some specific mid-rank and other name fixes (eg Propionibacterium to Cutibacterium)
+2. Create_Taxonomy_Database_2of3
+- does kingdom/organism type (viruses, satellites, phages, archaea, bacteria, eukaryota...) specific organization and name fixes for species and strain ranks
+- fills in missing mid-ranks found in species/strain
+- if no Kingdom-Genus ranks, adds mid-rank
+- the purpose is to get something more resembling a linnaean species in the species rank, something more unified, and make a distinct species rank
+3. Create_Taxonomy_Database_3of3
+- now that the species rank is streamlined and any mid levels that can be gleaned are filled in
+- standardized the mid level suffixes for each rank
+- fix synonyms in mixed or same rank levels
+- use the collective information to fill in missing ranks
+
+### EXAMPLES: 
+start: 1803148	EUKARYOTA	ASCOMYCOTA	SORDARIOMYCETES				XYLARIOMYCETIDAE_SP_ARIZ_AZ0199
+end: 1803148	EUKARYOTA	ASCOMYCOTA	SORDARIOMYCETES		XYLARIOMYCETIDAE		XYLARIOMYCETIDAE_SP	XYLARIOMYCETIDAE_SP_ARIZ_AZ0199
+start: 1000652	MONA	VIRUSES	HERVIVIRICETES	HERPESVIRALES	HERPESVIRIDAE		PROCAVIA_CAPENSIS_GAMMAHERPESVIRUS_2
+end: 1000652	MONA	VIRUSES	HERVIVIRICETES	HERPESVIRALES	HERPESVIRIDAE	GAMMAHERPESVIRUS	PROCAVIA_CAPENSIS_GAMMAHERPESVIRUS	PROCAVIA_CAPENSIS_GAMMAHERPESVIRUS_2
+
+### OUTPUTS:
+ - TAXONOMY_DB_[current year].txt: tab delimited taxonomy database
+ - TAXONOMY_DB_[current year].cyto: tab delimited network file for cytoscape (really it's too big to graph but you can check the "Target" column for duplicates to find issues in the code)
