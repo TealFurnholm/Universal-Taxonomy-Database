@@ -22,7 +22,6 @@ The previous version of this software did not handle strains - placing species a
  - https://talk.ictvonline.org/files/master-species-lists/m/msl/8266/download
  - open in excel, save the 3rd tab - master species list - as a tab delimited text file "ICTV.txt" 
  - put with the rest of the input files
-#### 4. Current taxonomy database
 
 ### RUNNING THE SCRIPT
 You need perl installed and either have the environment set up so you can just double click on the .pl files (windows) or run the perl scripts. Else put them in the perl "bin" folder. There are 3 scripts to run, each outputs a raw file so if there is a problem you can figure out where the problem occurs.
