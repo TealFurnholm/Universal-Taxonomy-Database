@@ -318,11 +318,9 @@ sub fix_names{
 
 	#remove junk punctuation/standardize
 	$name =~ s/\s+/_/g;
-	$name =~ s/[^\w\-]+/_/g;
+	$name =~ s/[^\w]+/_/g;
 	$name =~ s/\_+/\_/g;
 	$name =~ s/(^\_+|\_+$)//g;
-	$name =~ s/\-+\_+/\-/g;
-	$name =~ s/\_+\-+/\-/g;
 	$name =~ s/^(X|CF)\_//;
 	
 	return($name);
