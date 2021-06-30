@@ -27,8 +27,18 @@ while(<INPUT>){
 		@OLD=@NOW;
 
 		#SKIP NON-LINEAGED ENTRIES
-		if($NOW[0] eq "QUIDDAM"){ 	 if($NOW[1]!~/UNKNOWN/){ $NOW[1]="UNKNOWN_".$NOW[1];} $LINEAGES{$tid}= [@NOW]; for my $i (0..$#NOW){ $MIDS{$i}{$NOW[$i]}{$tid}=1;} next;}
-		if($NOW[0] eq "MICROBIOME"){ if($NOW[2]!~/MICROBIOME/){ $NOW[2].="_MICROBIOME"; } $LINEAGES{$tid}= [@NOW]; for my $i (0..$#NOW){ $MIDS{$i}{$NOW[$i]}{$tid}=1;} next;}
+		if($NOW[0] eq "QUIDDAM"){
+			if($NOW[1]!~/UNKNOWN/ && $NOW[1]=~/\w/){ $NOW[1]="UNKNOWN_".$NOW[1];} 
+			$LINEAGES{$tid}= [@NOW]; 
+			for my $i (0..$#NOW){ $MIDS{$i}{$NOW[$i]}{$tid}=1;} 
+			next;
+		}
+		if($NOW[0] eq "MICROBIOME"){     
+			if($NOW[2]!~/MICROBIOME/ && $NOW[2]=~/\w/){$NOW[2].="_MICROBIOME";} 
+			$LINEAGES{$tid}= [@NOW]; 
+			for my $i (0..$#NOW){ $MIDS{$i}{$NOW[$i]}{$tid}=1;} 
+			next;
+		}
 		
 		### FIX MID-LEVEL NON-CONFORMATION
 		$ch1=0; $ch2=0; $ch3=0; $ch4=0; $ch5=0;
@@ -510,6 +520,24 @@ foreach my $lev (sort(keys %ALLLEVS)){
 	}
 }
 
+$kc1=keys %LINEAGES;
+open(MERGED,"merged.dmp")||die;
+while(<MERGED>){
+       	if($_ !~/^\d/){next;}
+        $_ = uc($_);
+        $_ =~ s/[\r\n]+//;
+	$_=~/^(\d+)\D+(\d+)\D/;
+	$old=$1;
+	$new=$2;
+	if(exists($LINEAGES{$new})){
+		@NOW = @{$LINEAGES{$new}};
+		$LINEAGES{$old}=[@NOW];
+	}
+	else{$stillmissing++;}
+}
+$kc2=keys %LINEAGES;
+print "new kc $kc1 new and old kc $kc2 stillmissing $stillmissing\n";	
+
 
 
 $time = localtime;
@@ -518,7 +546,7 @@ $year = $1;
 $output = "TAXONOMY_DB_".$year.".txt";
 open(OUTPUT, ">", $output)||die;
 @RANKS=("KINGDOM","PHYLUM","CLASS","ORDER","FAMILY","GENUS","SPECIES","STRAIN");
-foreach my $tid (keys %LINEAGES){
+foreach my $tid (sort(keys %LINEAGES)){
 	@NOW = @{$LINEAGES{$tid}};
 	
 	#remove any trailing empties
@@ -534,16 +562,30 @@ foreach my $tid (keys %LINEAGES){
 
 	#make cytoscape tree
 	$NOW[0] =~ /^(.)/; $king = $1;
+	if($NOW[0] eq "MICROBIOME"){$king = "Y";}
 	for($i=0; $i<=$#NOW; $i++){
 			$type = $king."_".$i;
-			if($i == 0){ $phyla = "$type\tROOT\t$tmp[$i]"; $CYTO{$phyla}++;}
-			else{ $phyla = "$type\t$tmp[$i-1]\t$tmp[$i]"; $CYTO{$phyla}++;}
+			if($i == 0){ $phyla = "$type\tROOT\t$NOW[$i]";}
+			else{ $phyla = "$type\t$NOW[$i-1]\t$NOW[$i]";}
+			if($NOW[$i+1]=~/\w/){$NXLVL{$phyla}{$NOW[$i+1]}=1;}
+			$CYTO{$phyla}++;
+			if(grep{/CYANOBACTERIA/} @NOW){$CYANO{$phyla}=1;}
+			if(grep{/ARTHROPODA/} @NOW){$BUGS{$phyla}=1;}
 	}
 
 	$out = join("\t", @NOW);
 	print OUTPUT "$tid\t$out\n";
 }
 
-$output = "TAXONOMY_DB_".$year.".cyto";
+$outcyto = "TAXONOMY_DB_".$year.".cyto";
 open(OUTCYTO, ">", $outcyto)||die;
-foreach my $phyla (sort(keys %CYTO)){ print OUTCYTO "$phyla\t$CYTO{$phyla}\t$CYTO{$phyla}\n"; }
+print OUTCYTO "Level\tSource\tTarget\tSpecies_Count\tSpecies_Count\tNext_Level_Count\tNext_Level_Count\n";
+print OUTCYAN "Level\tSource\tTarget\tSpecies_Count\tSpecies_Count\tNext_Level_Count\tNext_Level_Count\n";
+print OUTBUG "Level\tSource\tTarget\tSpecies_Count\tSpecies_Count\tNext_Level_Count\tNext_Level_Count\n";
+foreach my $phyla (sort(keys %CYTO)){ 
+	$nxkc = keys %{$NXLVL{$phyla}};
+	print OUTCYTO "$phyla\t$CYTO{$phyla}\t$CYTO{$phyla}\t$nxkc\t$nxkc\n"; 
+	if(exists($BUGS{$phyla})){print OUTBUG "$phyla\t$CYTO{$phyla}\t$CYTO{$phyla}\t$nxkc\t$nxkc\n"; }
+	if(exists($CYANO{$phyla})){print OUTCYAN "$phyla\t$CYTO{$phyla}\t$CYTO{$phyla}\t$nxkc\t$nxkc\n"; }
+}
+
