@@ -1,3 +1,7 @@
+# PUT BUGS TO WORK ON HERE #
+
+# END OF BUG BIN #
+
 #use warnings;
 $time = localtime;
 $time =~ /(\d\d\d\d)$/;
@@ -11,7 +15,7 @@ while(<INPUT>){
 		$_ = uc($_);
 		$_ =~ s/[\r\n]+//;
 		@NOW = split("\t", $_,-1);
-		$tid = shift(@NOW);	
+		$tid = shift(@NOW);
 		$LINEAGES{$tid}= [@NOW];
 }
 
@@ -20,7 +24,6 @@ foreach my $tid (keys %LINEAGES){
 	@NOW = @{$LINEAGES{$tid}};
 	@OLD = @NOW;
 	if($NOW[0] =~ /QUIDDAM|MICROBIOME/){next;}
-	#if($NOW[0] !~ /ARCHAEA/){next;}
 
 	#IF EMPTY SPECIES, FILL WITH MID LEVEL	
 	if($NOW[6] !~ /\w/ && $NOW[7] !~ /\w/){
@@ -34,7 +37,20 @@ foreach my $tid (keys %LINEAGES){
 	#########################
 	if($NOW[0] eq "MONA"){
 		#SKIP CONSTRUCTS, PLASMIDS
-		if($NOW[1] !~ /VIRUS/ ){ next; }
+		if($NOW[1] !~ /VIRUS/ ){
+			if($NOW[6]=~/\w/){
+				@SPE = split("_",$NOW[6],-1); $NSPE=shift(@SPE);
+				foreach my $x (@SPE){if($NSPE !~ /(\_$x|\_$x\_|$x\_)/){$NSPE.="_".$x;}}
+				$NOW[6]=$NSPE;
+			}
+			if($NOW[7]=~/\w/){
+                                @SPE = split("_",$NOW[7],-1); $NSPE=shift(@SPE);
+                                foreach my $x (@SPE){if($NSPE !~ /(\_$x|\_$x\_|$x\_)/){$NSPE.="_".$x;}}
+                                $NOW[7]=$NSPE;
+                        }
+			$LINEAGES{$tid}=[@NOW];
+			next; 
+		}
 		if($NOW[2] !~ /PHAGE|SATELLITE/){ #TRUE VIRUSES	
 			
 			#FIX MISSING GENUS AND SPLIT NAMES AND UNIFY *VIRUS
@@ -94,7 +110,6 @@ foreach my $tid (keys %LINEAGES){
 			}
 			else{$NOW[6]=$test;}
 			if($NOW[7] eq $NOW[6]){ pop(@NOW); }
-			
 		}
 		elsif($NOW[2] =~ /PHAGE/){	
 	
@@ -123,9 +138,7 @@ foreach my $tid (keys %LINEAGES){
 			foreach my $x (@strain){ if($NOW[6] !~ /$x/ && $x =~ /\w/){ $NOW[6].="_".$x; }}
 			$NOW[7] = $NOW[6];
 			$NOW[6] =~ s/PHAGE.*/PHAGE/;
-			if($NOW[7] eq $NOW[6]){ pop(@NOW); }
-			
-			
+			if($NOW[7] eq $NOW[6]){ pop(@NOW); }		
 		}
 		elsif($NOW[2] eq "SATELLITES"){
 			#FIX BLANKS, WRONGS AND MISSING SATELLITE
@@ -142,7 +155,6 @@ foreach my $tid (keys %LINEAGES){
 				$NOW[6] =~ s/[A-Z]*SATELLITE/$NOW[5]/;
 				$NOW[7] =~ s/[A-Z]*SATELLITE/$NOW[5]/;
 			}
-			
 			#MERGE STRAIN AND SPECIES AND SPLIT
 			@strain = split("_",$NOW[7],-1);
 			foreach my $x (@strain){ if($NOW[6] !~ /$x/ && $x =~ /\w/){ $NOW[6].="_".$x; }}
@@ -158,34 +170,31 @@ foreach my $tid (keys %LINEAGES){
 			if($NOW[$i] !~ /\w/){next;} $last=$i; 
 			if($NOW[6] =~ /$NOW[$i]\_|$NOW[$i]$|$NOW[$i]\b/){$hit=$i;}
 		}
-		if($hit < 10 && $NOW[6] =~ /^[A-Z]+$/){ $new = $NOW[$hit]."_SP"; $NOW[6] =~ s/$NOW[$hit]/$new/; $NOW[7] =~ s/$NOW[$hit]/$new/;}
+		if($hit < 10 && $NOW[6] =~ /^[A-Z]+$/){ $new = $NOW[$hit]."_SP"; $
+			NOW[6] =~ s/$NOW[$hit]/$new/; $NOW[7] =~ s/$NOW[$hit]/$new/;}
 		if($NOW[6] !~ /\w/ && $last<10){ $NOW[6] = $NOW[$last]."_SP";}
 		if($hit < 5 && $NOW[6] !~ /(\_SP|PHAGE|SATELLITE|VIRUS)/){ $replace=$NOW[$hit]."_SP"; $NOW[6]=~ s/$NOW[$hit]/$replace/; }
 		
 		#MAKE SURE THAT SPECIES HAVE MID-LEVEL
 		$last=10; for my $i (0..5){ if($NOW[$i] !~ /\w/){next;} $last=$i; } #get last level
-		if($NOW[6] !~ /$NOW[$last]/ && $NOW[7] =~ /$NOW[$last]/ && $last<10){$tmp=$NOW[6]; $NOW[6]=$NOW[7]; $NOW[7]=$tmp;}
-		
+		if($NOW[6] !~ /$NOW[$last]/ && $NOW[7] =~ /$NOW[$last]/ && $last<10){ 
+			$tmp=$NOW[6]; $NOW[6]=$NOW[7]; $NOW[7]=$tmp;}
+
 		#REMOVE EXCESS SP
 		$NOW[6] =~ s/\_[\_SP]+\_/\_SP\_/g;
 		$NOW[6] =~ s/(\_+SP\_+.*)\_SP\_/$1\_/g;
 		$NOW[6] =~ s/(^\_+|\_+$)//g;
-		
+
+		if($NOW[6]=~/$NOW[7]/ && $NOW[7]=~/\w/){print "tid $tid now6 $NOW[6] contain now7 $NOW[7] @NOW\n"; pop(@NOW); }
+
 		#STORE AND NEXT - CELLULAR ORGS BELOW HAVE OTHER THINGS
-		if($tid =~ /0000$/){print "tid $tid old @OLD\ntid $tid new @NOW\n"; }
 		$LINEAGES{$tid}=[@NOW];	
 		next;
 	}
 	
 	#### CELLULAR ORGANISMS ####
 	############################
-	#IF MID-LEVEL FOR SPECIES
-	#if($NOW[6]=~ /([A-Z]+(IDAE|INAE|ACEAE))(\b|\_|$)/){ $NOW[4]=$1; print "old @OLD\nnew @NOW\n";}	
-	#if($NOW[6]=~ /([A-Z]+ALES)(\b|\_|$)/){ $NOW[3]=$1; print "old @OLD\nnew @NOW\n";}
-	
 	if($NOW[0] eq "BACTERIA"){
-		#print "now1 @NOW\n";
-		
 		$NOW[6] =~ s/\_BACTERIUM/\_SP/g;
 		$NOW[7] =~ s/\_BACTERIUM/\_SP/g;
 		$NOW[6] =~ s/^BACTERIUM/BACTERIA_SP/g;
@@ -230,13 +239,13 @@ foreach my $tid (keys %LINEAGES){
 		$NOW[6] =~ s/\_BACTERIA//g;
 		$NOW[6] =~ s/(.*)\_([A-Z]*$NOW[$hit].*)/$2\_$1/;
 		#REMOVE ANY NO-GOOD LOWER LEVELS
-		if($last>0 && $last<10){ for my $i (0..$last-1){ if($NOW[$i]=~/\w/){$NOW[6] =~ s/\_$NOW[$i]\_|\_$NOW[$i]$//; }}}
-		#print "now5 @NOW\n";
-		
-			
+		if($last>0 && $last<10){ 
+			for my $i (0..$last-1){ 
+				if($NOW[$i]=~/\w/){ $NOW[6] =~ s/\_$NOW[$i]\_|\_$NOW[$i]$/\_/; }
+			}
+		}
 	}
 	elsif($NOW[0] eq "EUKARYOTA"){
-		#print "now1 @NOW\n";
 		$NOW[6] =~ s/EUKARYOTE/EUKARYOTA/;
 		$NOW[7] =~ s/EUKARYOTE/EUKARYOTA/;
 		@strain = split("_", $NOW[7],-1);
@@ -268,7 +277,7 @@ foreach my $tid (keys %LINEAGES){
 		$NOW[6] =~ s/\_EUKARYOTA//g;
 		$NOW[6] =~ s/(.*)\_([A-Z]*$NOW[$hit].*)/$2\_$1/;
 		#REMOVE ANY NO-GOOD LOWER LEVELS
-		if($last>0 && $last<10){ for my $i (0..$last-1){ if($NOW[$i]=~/\w/){$NOW[6] =~ s/\_$NOW[$i]\_|\_$NOW[$i]$//; }}}
+		if($last>0 && $last<10){ for my $i (0..$last-1){ if($NOW[$i]=~/\w/){$NOW[6] =~ s/\_$NOW[$i]\_|\_$NOW[$i]$/\_/; }}}
 	}
 	elsif($NOW[0] eq "ARCHAEA"){
 		
@@ -285,7 +294,6 @@ foreach my $tid (keys %LINEAGES){
 		$test = join(";",@NOW[0..7]);
 		$test =~ s/BACTERIA/ARCHAEA/g;
 		@NOW = split(";",$test,-1);
-		#print "now1 $NOW[6]\n";
 					
 		#IF NO MID LEVELS
 		$test = join("",@NOW[1..5]);
@@ -323,7 +331,7 @@ foreach my $tid (keys %LINEAGES){
 		$NOW[6] =~ s/\_ARCHAEA//g;
 		$NOW[6] =~ s/(.*)\_([A-Z]*$NOW[$hit].*)/$2\_$1/;
 		#REMOVE ANY NO-GOOD LOWER LEVELS
-		if($last>0 && $last<10){ for my $i (0..$last-1){ if($NOW[$i]=~/\w/){$NOW[6] =~ s/\_$NOW[$i]\_|\_$NOW[$i]$//; }}}
+		if($last>0 && $last<10){ for my $i (0..$last-1){ if($NOW[$i]=~/\w/){$NOW[6] =~ s/\_$NOW[$i]\_|\_$NOW[$i]$/\_/; }}}
 	}
 	else{ print "what is this tid $tid @NOW\n"; die;}
 	### NOW ALL NAMES ARE CLEANED ###
@@ -376,7 +384,7 @@ foreach my $tid (keys %LINEAGES){
 	#REMOVE EXCESS SP
 	$NOW[6] =~ s/\_[\_SP]+\_/\_SP\_/g;
 	$NOW[6] =~ s/(\_+SP\_+.*)\_SP\_/$1\_/g;
-	$NOW[6] =~ s/(^\_+|\_+$)//g;
+	$NOW[6] =~ s/(^\_+|\_+$|\_\_)//g;
 	
 	#DO FINAL CLEANUP - split species & strain
 	@SPE=split("_",$NOW[6],-1); @GSPE=();
@@ -391,9 +399,9 @@ foreach my $tid (keys %LINEAGES){
 	for my $i (0..5){ if($NOW[$i] !~ /\w/){next;} $last=$i; if($NOW[6] =~ /$NOW[$i]\_|$NOW[$i]$|$NOW[$i]\b/){$hit=$i;}}
 	if($NOW[6] !~ /_SP/ && $hit < 10 && $NOW[6] =~ /^[A-Z]+$/){$new = $NOW[$hit]."_SP"; $NOW[6] =~ s/$NOW[$hit]/$new/; }
 	if($NOW[6] !~ /\w/ && $last<10){ $NOW[6] = $NOW[$last]."_SP"; }
+	$NOW[6] =~ s/(^\_+|\_+$|\_\_)//g;
 	
 	#OUTPUT
-	#print "now8 @NOW\n";
 	if($tid =~ /0000$/){print "tid $tid old @OLD\ntid $tid new @NOW\n"; }
 	$LINEAGES{$tid}=[@NOW];	
 }
