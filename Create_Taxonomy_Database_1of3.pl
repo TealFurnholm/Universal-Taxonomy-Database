@@ -1,7 +1,7 @@
 #use warnings;
 # PUT BUGS HERE TO WORK ON #
+# - set up the files to be auto input using qx{ wget...}, 
 # END OF BUG BIN #
-
 
 #GET I/O FILES
 $file = "https://ftp.ncbi.nih.gov/pub/taxonomy/new_taxdump/new_taxdump.tar.gz";
@@ -10,9 +10,11 @@ qx{wget -O new_taxdump.tar.gz $file};
 my $indat  = qx{tar -tzf new_taxdump.tar.gz | grep -P "^fullnamelineage.dmp"};
 my $inlevs = qx{tar -tzf new_taxdump.tar.gz | grep -P "^nodes.dmp"};
 my $inlin  = qx{tar -tzf new_taxdump.tar.gz | grep -P "^taxidlineage.dmp"};
+my $inmrg  = qx{tar -tzf new_taxdump.tar.gz | grep -P "^merged.dmp"};
 qx{tar --extract --occurrence=1 --file=new_taxdump.tar.gz $indat};
 qx{tar --extract --occurrence=1 --file=new_taxdump.tar.gz $inlevs};
 qx{tar --extract --occurrence=1 --file=new_taxdump.tar.gz $inlin};
+qx{tar --extract --occurrence=1 --file=new_taxdump.tar.gz $inmrg};
 
 $inictv = 'ICTV.txt';
 $inimg = 'All_IMG_Genomes.txt';
@@ -85,6 +87,11 @@ while(<INIMG>){
 		$tid = shift(@stuff);
 		
 		#FIX NAME AND FILL MISSING
+		if($stuff[7] =~ /^0$/){$stuff[7]="";}
+		if($_ =~ /\bPLASMID\b/ && $stuff[6] !~ /PLASMID/ && $stuff[7] !~/PLASMID/){
+			if($stuff[7]=~/\w/){$stuff[7].="_PLASMID";}
+			else{$stuff[6].="_PLASMID";}
+		}
 		@TMP = @stuff[0..8]; 	# 0:Domain 1:Phylum 2:Class 3:Order 4:Family 5:Genus 6:Species 7:Strain 8:Genome/Sample
 		if($TMP[0]=~/UNKNOWN/ && $_ =~ /ARCHAEON/){ $TMP[0] = "ARCHAEA";}	#FIX IMG UNKNOWN ARCHAEON ISSUE
 		for my $y (0..8){ $TMP[$y] = fix_names($TMP[$y]); } 			#GENERAL NAME CLEAN-UP
@@ -145,8 +152,6 @@ while(<INIMG>){
 		if($NOW[4] =~ /\w/){ $MIDS{$NOW[4]}=4; } #track mid names for later
 		if($NOW[5] =~ /\w/){ $MIDS{$NOW[5]}=5; } #track mid names for later		
 		$LINEAGES{$oid}=[@NOW];
-
-		print "oid $oid now @NOW\n";
 }
 #######################################
 #######################################
