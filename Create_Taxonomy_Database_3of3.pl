@@ -1,3 +1,5 @@
+#use warnings;
+
 ### THIS ROUND INVOLVES FIXING MID-LEVEL INCONSISTENCIES OR GAPS ###
 # 1. FIRST MAKE SURE LEVELS CONFORM TO TAXONOMIC STANDARDS, FIX INCESTUOUS NAMES
 # 2. RENAME PREFIX FOR ANY MIXED RANK SYNONYMS THAT CANT BE FIXED WITH SUFFIX CORRECTION
@@ -9,7 +11,6 @@
 #then Japanese numbers - since so many greek
 
 ### 1. MAKE MID LEVELS CONFORM TO NAMING SUFFIX STANDARDS BY RANK ###
-#use warnings;
 $time = localtime;
 $time = uc($time);
 $time =~ /^[A-Z]+\s+([A-Z]+)\s+\S+\s+\S+\s+(\d\d\d\d)/;
@@ -48,8 +49,8 @@ while(<INPUT>){
                 $ch1=0; $ch2=0; $ch3=0; $ch4=0; $ch5=0;
                 if($NOW[1] =~ /(ACEAE|IDAE|EAE|ALES|IIA|IUM)$/){$tmp=$NOW[1]; $NOW[1] =~ s/(ACEAE|IDAE|EAE|ALES|IIA|IUM)$/IA/;  $NOW[6]=~s/$tmp/$NOW[1]/; $NOW[7]=~s/$tmp/$NOW[1]/; $FIXP++; $ch1++;}
                 if($NOW[2] =~ /(ACEAE|IDAE|ALES|EAE|IUM)$/){    $tmp=$NOW[2]; $NOW[2] =~ s/(ACEAE|IDAE|ALES|EAE|IUM)$/IIA/;     $NOW[6]=~s/$tmp/$NOW[2]/; $NOW[7]=~s/$tmp/$NOW[2]/; $FIXC++; $ch2++;}
-                if($NOW[3] =~ /(ACEAE|IDAE|IIA|EAE|IUM)$/){             $tmp=$NOW[3]; $NOW[3] =~ s/(ACEAE|IDAE|IIA|EAE|IUM)$/ALES/;             $NOW[6]=~s/$tmp/$NOW[3]/; $NOW[7]=~s/$tmp/$NOW[3]/; $FIXO++; $ch3++;}
-                if($NOW[4] =~ /(ALES|IIA|IUM)$/){                               $tmp=$NOW[4]; $NOW[4] =~ s/(ALES|IIA|IUM)$/ACEA/;                               $NOW[6]=~s/$tmp/$NOW[4]/; $NOW[7]=~s/$tmp/$NOW[4]/; $FIXF++; $ch4++;}
+                if($NOW[3] =~ /(ACEAE|IDAE|IIA|EAE|IUM)$/){     $tmp=$NOW[3]; $NOW[3] =~ s/(ACEAE|IDAE|IIA|EAE|IUM)$/ALES/;     $NOW[6]=~s/$tmp/$NOW[3]/; $NOW[7]=~s/$tmp/$NOW[3]/; $FIXO++; $ch3++;}
+                if($NOW[4] =~ /(ALES|IIA|IUM)$/){               $tmp=$NOW[4]; $NOW[4] =~ s/(ALES|IIA|IUM)$/ACEA/;               $NOW[6]=~s/$tmp/$NOW[4]/; $NOW[7]=~s/$tmp/$NOW[4]/; $FIXF++; $ch4++;}
                 if($NOW[5] =~ /\w\w(ACEAE|IDAE|ALES|EAE|IIA)$/){$tmp=$NOW[5]; $NOW[5] =~ s/I*(ACEAE|IDAE|ALES|EAE|IIA)$/IUM/;   $NOW[6]=~s/$tmp/$NOW[5]/; $NOW[7]=~s/$tmp/$NOW[5]/; $FIXG++; $ch5++;}
 
                 for my $i (0..5){ $MIDS{$i}{$NOW[$i]}{$tid}=1;}
@@ -569,8 +570,6 @@ foreach my $tid (sort(keys %LINEAGES)){
                         else{ $phyla = "$type\t$NOW[$i-1]\t$NOW[$i]";}
                         if($NOW[$i+1]=~/\w/){$NXLVL{$phyla}{$NOW[$i+1]}=1;}
                         $CYTO{$phyla}++;
-                        if(grep{/CYANOBACTERIA/} @NOW){$CYANO{$phyla}=1;}
-                        if(grep{/ARTHROPODA/} @NOW){$BUGS{$phyla}=1;}
         }
 
         $out = join("\t", @NOW);
@@ -578,15 +577,14 @@ foreach my $tid (sort(keys %LINEAGES)){
 }
 
 open(OUTCYTO, ">", $outcyto)||die;
-open(OUTBUG, ">", "INSECTS.cyto")||die;
-open(OUTCYAN, ">", "CYANOBACTERIA.cyto")||die;
 print OUTCYTO "Level\tSource\tTarget\tSpecies_Count\tSpecies_Count\tNext_Level_Count\tNext_Level_Count\n";
-print OUTCYAN "Level\tSource\tTarget\tSpecies_Count\tSpecies_Count\tNext_Level_Count\tNext_Level_Count\n";
-print OUTBUG "Level\tSource\tTarget\tSpecies_Count\tSpecies_Count\tNext_Level_Count\tNext_Level_Count\n";
 foreach my $phyla (sort(keys %CYTO)){
         $nxkc = keys %{$NXLVL{$phyla}};
         print OUTCYTO "$phyla\t$CYTO{$phyla}\t$CYTO{$phyla}\t$nxkc\t$nxkc\n";
-        if(exists($BUGS{$phyla})){print OUTBUG "$phyla\t$CYTO{$phyla}\t$CYTO{$phyla}\t$nxkc\t$nxkc\n"; }
-        if(exists($CYANO{$phyla})){print OUTCYAN "$phyla\t$CYTO{$phyla}\t$CYTO{$phyla}\t$nxkc\t$nxkc\n"; }
 }
+
+qx{rm *.dmp};
+qx{rm TAXONOMY_DB*raw*};
+
+
 
