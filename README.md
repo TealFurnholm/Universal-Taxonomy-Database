@@ -1,6 +1,6 @@
 # Universal-Taxonomy-Database
 This script creates a highly curated and organized taxonomy, a heirarchical tree-of-life for use in any community base 'omics  
-This is #1 of a series of pipelines that create-curate a Universal Reference for various 'omics data.
+This is #1 of a series of pipelines that create-curate the Universal Multi-omics Reference and Alignment Database
     <br>1. Universal Taxonomy Database: *this repository*
     <br>2. Universal Compounds Database: [found here](https://github.com/TealFurnholm/Universal_Biological_Compounds_Database/)
     <br>3. Universal Reactions Database: [found here](https://github.com/TealFurnholm/Universal_Biological_Reactions_Database)
