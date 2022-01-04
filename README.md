@@ -22,7 +22,7 @@ In case the link breaks replace this link (https://ftp.ncbi.nih.gov/pub/taxonomy
 Sorry, but IMG is a crappy "walled garden", too hard for them to make an ftp site
 1. You are going to have to get an ER login
 2. log in and go to: https://img.jgi.doe.gov/cgi-bin/mer/main.cgi
-3. Click on the following categories: archaea, bacteria, plasmids, viruses, eukaryotes, and metagenomes -- you want to use "ALL"  not just IMG genomes
+3. Click on the following categories: archaea, bacteria, plasmids, viruses, eukaryotes, and metagenomes -- you want to use "ALL"  not just JGI genomes
 ![Alt text](https://github.com/TealFurnholm/Universal-Taxonomy-Database/blob/master/IMG_taxonomy_source.png)
  - since bacteria are so many, paste the follow link: https://img.jgi.doe.gov/cgi-bin/mer/main.cgi?section=TaxonList&page=taxonListAlpha&domain=Bacteria
 5. make sure the following columns are selected (checkboxes at bottom)
