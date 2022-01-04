@@ -22,12 +22,15 @@ In case the link breaks replace this link (https://ftp.ncbi.nih.gov/pub/taxonomy
 Sorry, but IMG is a crappy "walled garden", too hard for them to make an ftp site
 1. You are going to have to get an ER login
 2. log in and go to: https://img.jgi.doe.gov/cgi-bin/mer/main.cgi
-3. Click on each of the categories of genomes: archaea, bacteria, plasmids, viruses, eukaryotes, and metagenomes 
-4. make sure the following columns are selected (checkboxes at bottom)
+3. Click on the following categories: archaea, bacteria, plasmids, viruses, eukaryotes, and metagenomes 
+![Alt text](https://github.com/TealFurnholm/Universal-Taxonomy-Database/blob/master/IMG_taxonomy_source.png)
+ - since bacteria are so many, paste the follow link: https://img.jgi.doe.gov/cgi-bin/mer/main.cgi?section=TaxonList&page=taxonListAlpha&domain=Bacteria
+5. make sure the following columns are selected (checkboxes at bottom)
  - "taxon_oid" "NCBI Taxon ID" "Domain" "Phylum" "Class" "Order" "Family" "Genus" "Species" "Strain" "Genome Name / Sample Name"
-5. select all and hit the export button
-6. open in Excel and order the columns **exactly as shown above**, delete any other columns
-7. save as "All_IMG_Genomes.txt" and transfer to wherever you are updating the taxonomy
+6. select all and hit the export button
+![Alt text](https://github.com/TealFurnholm/Universal-Taxonomy-Database/blob/master/export_img_taxa.png)
+8. open in Excel and order the columns **exactly as shown above**, delete any other columns
+9. save as "All_IMG_Genomes.txt" and transfer to wherever you are updating the taxonomy
 
 #### ICTV - !! MANUAL !!
 Get the structural categories from the International Committee on Taxonomy of Viruses
